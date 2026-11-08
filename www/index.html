@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Celengan</title>
+<title>NabungYuk</title>
 <style>
   :root { --bg:#f4f6fb; --card:#fff; --text:#1d2433; --muted:#6b7385; --main:#16a34a; --main2:#4ade80; --red:#dc2626; --line:#e5e7ef; }
   html[data-tema=biru] { --main:#2563eb; --main2:#60a5fa; }
@@ -11,7 +11,7 @@
   html[data-tema=oranye] { --main:#ea580c; --main2:#fbbf24; }
   @media (prefers-color-scheme: dark) { :root { --bg:#0f131a; --card:#1a1f2b; --text:#eef0f6; --muted:#98a0b3; --line:#2a3142; } }
   * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 16px 40px; transition:background .3s; }
+  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 16px 90px; transition:background .3s; }
   h1 { font-size:20px; margin:20px 0 12px; }
   .card { background:var(--card); border-radius:18px; padding:16px; margin-bottom:14px; border:1px solid var(--line); animation:naik .5s both; }
   .hero { background:linear-gradient(135deg,var(--main),var(--main2)); color:#fff; border:0; }
@@ -20,7 +20,7 @@
   .muted { color:var(--muted); font-size:13px; }
   .bar { height:10px; background:rgba(255,255,255,.3); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
   .bar > div { height:100%; background:#fff; width:0; transition:width .6s; }
-  input, textarea { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; font-family:inherit; }
+  input, textarea, select { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; font-family:inherit; }
   .row, .quick { display:flex; gap:8px; }
   button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); transition:transform .1s; }
   button:active { transform:scale(.96); }
@@ -30,11 +30,15 @@
   .dots { display:flex; gap:12px; margin:8px 0; }
   .dot { width:34px; height:34px; border-radius:50%; padding:0; flex:none; border:3px solid transparent; }
   .dot.on { border-color:var(--text); }
+  .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
   .item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); animation:naik .35s both; }
   .item:last-child { border-bottom:0; }
   .item .kiri { flex:1; } .kanan { display:flex; align-items:center; gap:8px; }
   .plus { color:var(--main); font-weight:700; } .minus { color:var(--red); font-weight:700; }
   .foot { text-align:center; margin-top:24px; }
+  #banner { display:none; background:#fef3c7; color:#92400e; border-radius:14px; padding:12px 14px; margin-bottom:14px; font-size:14px; justify-content:space-between; align-items:center; gap:8px; }
+  #toast { position:fixed; left:16px; right:16px; bottom:calc(20px + env(safe-area-inset-bottom)); z-index:150; background:#1d2433; color:#fff; border-radius:14px; padding:12px 14px; display:none; justify-content:space-between; align-items:center; gap:8px; }
+  #toast button { background:rgba(255,255,255,.18); color:#fff; padding:6px 12px; font-size:14px; flex:none; }
   #splash { position:fixed; inset:0; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(160deg,var(--main),var(--main2)); color:#fff; text-align:center; transition:opacity .5s, transform .5s; overflow:hidden; }
   #splash.hide { opacity:0; transform:scale(1.15); pointer-events:none; }
   .babi { font-size:100px; animation:pantul 1s ease-in-out infinite; }
@@ -53,26 +57,24 @@
 <div id="splash" onclick="tutupSplash()">
   <div class="babi">🐷</div>
   <h2 id="salam"></h2>
-  <p>Ayo nabung hari ini!</p>
+  <p>NabungYuk, ayo nabung hari ini!</p>
   <small>Ketuk untuk lanjut</small>
 </div>
 
-<h1>🐷 Celengan</h1>
+<h1>🐷 NabungYuk</h1>
+
+<div id="banner"><span id="bannerTeks"></span><button class="small" onclick="tutupBanner()">Tutup</button></div>
 
 <div class="card hero">
   <div class="muted" id="sapa">Saldo tabungan</div>
-  <div class="saldo" id="saldo">Rp0</div>
+  <div class="saldo" id="saldo">0</div>
   <div class="bar"><div id="prog"></div></div>
   <div class="muted" id="targetInfo">Belum ada target</div>
 </div>
 
 <div class="card">
-  <div class="quick">
-    <button class="small" onclick="cepat(10000)">+10rb</button>
-    <button class="small" onclick="cepat(50000)">+50rb</button>
-    <button class="small" onclick="cepat(100000)">+100rb</button>
-  </div>
-  <input id="jumlah" type="number" inputmode="numeric" placeholder="Jumlah (Rp)">
+  <div class="quick" id="quick"></div>
+  <input id="jumlah" type="number" step="any" inputmode="decimal" placeholder="Jumlah">
   <input id="catatan" type="text" placeholder="Catatan (opsional)">
   <div class="row">
     <button onclick="tambah(1)">+ Nabung</button>
@@ -86,7 +88,10 @@
 </div>
 
 <div class="card">
-  <div class="muted" style="margin-bottom:6px">Riwayat</div>
+  <div class="head">
+    <div class="muted">Riwayat</div>
+    <button class="small" id="btnUndo" onclick="urungkan()">↩ Urungkan</button>
+  </div>
   <div id="riwayat"></div>
   <button class="small" style="width:100%;margin-top:10px" onclick="reset()">Hapus semua data</button>
 </div>
@@ -94,9 +99,27 @@
 <div class="card">
   <div class="muted">Pengaturan</div>
   <input id="nama" type="text" placeholder="Nama panggilan" style="margin-top:8px" onchange="setNama()">
-  <input id="target" type="number" inputmode="numeric" placeholder="Target tabungan (Rp)">
-  <button class="small" style="width:100%" onclick="setTarget()">Simpan target</button>
-  <div class="muted" style="margin-top:12px">Tema</div>
+  <input id="target" type="number" step="any" inputmode="decimal" placeholder="Target tabungan">
+  <button class="small" style="width:100%;margin-bottom:12px" onclick="setTarget()">Simpan target</button>
+  <div class="muted">Mata uang (hanya simbol, tidak dikonversi)</div>
+  <select id="cur" onchange="setCur()" style="margin-top:6px">
+    <option value="IDR">Rupiah (IDR)</option>
+    <option value="USD">Dolar AS (USD)</option>
+    <option value="EUR">Euro (EUR)</option>
+    <option value="SGD">Dolar Singapura (SGD)</option>
+    <option value="MYR">Ringgit (MYR)</option>
+    <option value="JPY">Yen (JPY)</option>
+    <option value="GBP">Poundsterling (GBP)</option>
+    <option value="AUD">Dolar Australia (AUD)</option>
+  </select>
+  <div class="muted">Pengingat nabung</div>
+  <select id="remind" onchange="setRemind()" style="margin-top:6px">
+    <option value="0">Mati</option>
+    <option value="1">Setiap hari</option>
+    <option value="7">Setiap minggu</option>
+    <option value="30">Setiap bulan</option>
+  </select>
+  <div class="muted">Tema</div>
   <div class="dots" id="dots"></div>
 </div>
 
@@ -109,26 +132,65 @@
   </div>
 </div>
 
-<p class="muted foot">Celengan v4.0.0 · by naufallovephone</p>
+<p class="muted foot">NabungYuk v5.0.0 · by naufallovephone</p>
+
+<div id="toast"><span id="toastTeks"></span><button onclick="urungkan()">Urungkan</button></div>
 
 <script>
-const KEY = 'celengan-data';
+const KEY = 'celengan-data', UKEY = 'nabungyuk-undo';
 const TEMA = [['hijau','#16a34a'],['biru','#2563eb'],['ungu','#7c3aed'],['oranye','#ea580c']];
-let data = { target: 0, log: [], tema: 'hijau', nama: '' };
+let data = { target: 0, log: [], tema: 'hijau', nama: '', cur: 'IDR', remind: 0 };
 try { data = Object.assign(data, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+let undoStack = [];
+try { undoStack = JSON.parse(localStorage.getItem(UKEY)) || []; } catch (e) {}
+let bannerTutup = false, toastTimer = null;
 
 const $ = id => document.getElementById(id);
-const rp = n => 'Rp' + Number(n).toLocaleString('id-ID');
 const simpan = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+const simpanUndo = () => { try { localStorage.setItem(UKEY, JSON.stringify(undoStack)); } catch (e) {} };
 const hitung = log => log.reduce((s, x) => s + x.nominal, 0);
+const bulat = n => Math.round(n * 100) / 100;
+
+function fmt(n) {
+  try {
+    return new Intl.NumberFormat(data.cur === 'IDR' ? 'id-ID' : 'en-US', {
+      style: 'currency', currency: data.cur,
+      maximumFractionDigits: (data.cur === 'IDR' || data.cur === 'JPY') ? 0 : 2
+    }).format(n);
+  } catch (e) { return data.cur + ' ' + n; }
+}
+
+function snap() {
+  undoStack.push(JSON.stringify({ log: data.log, target: data.target }));
+  if (undoStack.length > 15) undoStack.shift();
+  simpanUndo();
+}
+
+function toast(teks) {
+  $('toastTeks').textContent = teks;
+  $('toast').style.display = 'flex';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('toast').style.display = 'none'; }, 5000);
+}
+
+function urungkan() {
+  if (!undoStack.length) return;
+  const s = JSON.parse(undoStack.pop());
+  data.log = s.log; data.target = s.target;
+  simpanUndo(); simpan(); render();
+  $('toastTeks').textContent = 'Aksi terakhir dibatalkan';
+  $('toast').style.display = 'flex';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('toast').style.display = 'none'; }, 2500);
+}
 
 let tampil = 0;
 function animSaldo(to) {
   const from = tampil, t0 = performance.now();
   (function f(t) {
     const k = Math.min(1, (t - t0) / 700);
-    tampil = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-    $('saldo').textContent = rp(tampil);
+    tampil = bulat(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    $('saldo').textContent = fmt(tampil);
     if (k < 1) requestAnimationFrame(f);
   })(t0);
 }
@@ -146,6 +208,23 @@ function hujan(emoji, n) {
   }
 }
 
+function cekBanner() {
+  const b = $('banner');
+  b.style.display = 'none';
+  if (!data.remind || bannerTutup) return;
+  const terakhir = data.log.slice().reverse().find(x => x.nominal > 0);
+  if (!terakhir) {
+    $('bannerTeks').textContent = '⏰ Kamu belum punya tabungan. Yuk mulai nabung!';
+    b.style.display = 'flex'; return;
+  }
+  const hari = Math.floor((Date.now() - terakhir.waktu) / 86400000);
+  if (hari >= data.remind) {
+    $('bannerTeks').textContent = '⏰ Sudah ' + hari + ' hari belum nabung. Yuk nabung lagi!';
+    b.style.display = 'flex';
+  }
+}
+function tutupBanner() { bannerTutup = true; $('banner').style.display = 'none'; }
+
 function render() {
   document.documentElement.dataset.tema = data.tema;
   const saldo = hitung(data.log);
@@ -154,15 +233,29 @@ function render() {
   const pct = data.target > 0 ? Math.min(100, Math.round(saldo / data.target * 100)) : 0;
   $('prog').style.width = pct + '%';
   $('targetInfo').textContent = data.target > 0
-    ? pct + '% dari ' + rp(data.target) + (saldo >= data.target ? ' 🎉 Tercapai!' : ' (kurang ' + rp(data.target - saldo) + ')')
+    ? pct + '% dari ' + fmt(data.target) + (saldo >= data.target ? ' 🎉 Tercapai!' : ' (kurang ' + fmt(data.target - saldo) + ')')
     : 'Belum ada target';
   const masuk = data.log.filter(x => x.nominal > 0).reduce((s, x) => s + x.nominal, 0);
   const keluar = data.log.filter(x => x.nominal < 0).reduce((s, x) => s - x.nominal, 0);
   $('stat').innerHTML = '<span class="plus"></span> total masuk<br><span class="minus"></span> total diambil<br><span class="muted"></span>';
-  $('stat').children[0].textContent = rp(masuk);
-  $('stat').children[1].textContent = rp(keluar);
+  $('stat').children[0].textContent = fmt(masuk);
+  $('stat').children[1].textContent = fmt(keluar);
   $('stat').children[2].textContent = data.log.length + ' transaksi';
   $('nama').value = data.nama;
+  $('cur').value = data.cur;
+  $('remind').value = String(data.remind);
+  $('btnUndo').style.opacity = undoStack.length ? 1 : 0.4;
+
+  const Q = data.cur === 'IDR' ? [10000, 50000, 100000] : data.cur === 'JPY' ? [1000, 5000, 10000] : [5, 10, 50];
+  $('quick').innerHTML = '';
+  Q.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'small';
+    b.textContent = '+' + fmt(v);
+    b.onclick = () => { $('jumlah').value = bulat((parseFloat($('jumlah').value) || 0) + v); };
+    $('quick').appendChild(b);
+  });
+
   $('dots').innerHTML = '';
   TEMA.forEach(([k, c]) => {
     const b = document.createElement('button');
@@ -171,9 +264,10 @@ function render() {
     b.onclick = () => { data.tema = k; simpan(); render(); };
     $('dots').appendChild(b);
   });
+
   const el = $('riwayat');
   el.innerHTML = '';
-  if (!data.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; return; }
+  if (!data.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; cekBanner(); return; }
   data.log.map((x, i) => ({ x, i })).reverse().forEach(({ x, i }) => {
     const d = document.createElement('div');
     d.className = 'item';
@@ -186,7 +280,7 @@ function render() {
     kanan.className = 'kanan';
     const nom = document.createElement('span');
     nom.className = x.nominal > 0 ? 'plus' : 'minus';
-    nom.textContent = (x.nominal > 0 ? '+' : '−') + rp(Math.abs(x.nominal));
+    nom.textContent = (x.nominal > 0 ? '+' : '−') + fmt(Math.abs(x.nominal));
     const h = document.createElement('button');
     h.className = 'small';
     h.textContent = '✕';
@@ -195,18 +289,19 @@ function render() {
     d.append(kiri, kanan);
     el.appendChild(d);
   });
+  cekBanner();
 }
 
-function cepat(n) { $('jumlah').value = (parseInt($('jumlah').value, 10) || 0) + n; }
-
 function tambah(tanda) {
-  const n = parseInt($('jumlah').value, 10);
+  const n = bulat(parseFloat($('jumlah').value));
   if (!n || n <= 0) return alert('Isi jumlah yang benar.');
   const sebelum = hitung(data.log);
   if (tanda < 0 && n > sebelum) return alert('Saldo tidak cukup.');
+  snap();
   data.log.push({ nominal: n * tanda, catatan: $('catatan').value.trim(), waktu: Date.now() });
   $('jumlah').value = ''; $('catatan').value = '';
   simpan(); render();
+  toast(tanda > 0 ? 'Tabungan ditambahkan' : 'Uang diambil');
   if (tanda > 0) hujan(['🪙'], 10);
   const sesudah = sebelum + n * tanda;
   if (data.target > 0 && sebelum < data.target && sesudah >= data.target) setTimeout(() => hujan(['🎉', '✨', '🎊'], 36), 500);
@@ -215,13 +310,23 @@ function tambah(tanda) {
 function hapus(i) {
   if (!confirm('Hapus transaksi ini?')) return;
   const sisa = data.log.filter((_, k) => k !== i);
-  if (hitung(sisa) < 0) return alert('Tidak bisa dihapus: saldo akan jadi minus.');
+  if (hitung(sisa) < -0.001) return alert('Tidak bisa dihapus: saldo akan jadi minus.');
+  snap();
   data.log = sisa; simpan(); render();
+  toast('Transaksi dihapus');
 }
 
-function setTarget() { data.target = parseInt($('target').value, 10) || 0; simpan(); render(); }
+function setTarget() { snap(); data.target = parseFloat($('target').value) || 0; $('target').value = ''; simpan(); render(); }
 function setNama() { data.nama = $('nama').value.trim().slice(0, 20); simpan(); render(); }
-function reset() { if (confirm('Hapus semua data celengan?')) { data.target = 0; data.log = []; simpan(); render(); } }
+function setCur() { data.cur = $('cur').value; simpan(); tampil = 0; render(); }
+function setRemind() { data.remind = parseInt($('remind').value, 10) || 0; bannerTutup = false; simpan(); render(); }
+
+function reset() {
+  if (!confirm('Hapus semua data celengan? (Masih bisa diurungkan)')) return;
+  snap();
+  data.target = 0; data.log = []; simpan(); render();
+  toast('Semua data dihapus');
+}
 
 function ekspor() {
   const el = $('backup');
@@ -236,9 +341,12 @@ function impor() {
     const p = JSON.parse($('backup').value);
     if (!p || !Array.isArray(p.log)) throw new Error('format');
     if (!confirm('Timpa data sekarang dengan data backup?')) return;
+    snap();
     data.log = p.log.filter(x => typeof x.nominal === 'number' && isFinite(x.nominal));
     data.target = Number(p.target) || 0;
     if (TEMA.some(t => t[0] === p.tema)) data.tema = p.tema;
+    if (['IDR','USD','EUR','SGD','MYR','JPY','GBP','AUD'].includes(p.cur)) data.cur = p.cur;
+    if ([0, 1, 7, 30].includes(p.remind)) data.remind = p.remind;
     data.nama = String(p.nama || '').slice(0, 20);
     simpan(); render(); $('backup').value = '';
     alert('Impor berhasil.');
