@@ -17,14 +17,19 @@
   .muted { color:var(--muted); font-size:13px; }
   .bar { height:10px; background:var(--line); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
   .bar > div { height:100%; background:var(--main); width:0; transition:width .3s; }
-  input { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; }
+  input, textarea { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; font-family:inherit; }
   .row { display:flex; gap:8px; }
   button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); }
   button.out { background:var(--red); }
   button.small { flex:none; padding:6px 10px; font-size:12px; background:var(--line); color:var(--muted); }
-  .item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .quick { display:flex; gap:6px; margin-bottom:8px; }
+  .quick button { padding:8px 4px; font-size:13px; }
+  .item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); }
   .item:last-child { border-bottom:0; }
+  .item .kiri { flex:1; }
+  .item .kanan { display:flex; align-items:center; gap:8px; }
   .plus { color:var(--main); font-weight:600; } .minus { color:var(--red); font-weight:600; }
+  .foot { text-align:center; margin-top:24px; }
 </style>
 </head>
 <body>
@@ -43,6 +48,11 @@
 </div>
 
 <div class="card">
+  <div class="quick">
+    <button class="small" onclick="cepat(10000)">+10rb</button>
+    <button class="small" onclick="cepat(50000)">+50rb</button>
+    <button class="small" onclick="cepat(100000)">+100rb</button>
+  </div>
   <input id="jumlah" type="number" inputmode="numeric" placeholder="Jumlah (Rp)">
   <input id="catatan" type="text" placeholder="Catatan (opsional)">
   <div class="row">
@@ -57,6 +67,17 @@
   <button class="small" style="width:100%;margin-top:10px" onclick="reset()">Hapus semua data</button>
 </div>
 
+<div class="card">
+  <div class="muted" style="margin-bottom:6px">Backup data</div>
+  <textarea id="backup" rows="3" placeholder="Tekan Ekspor untuk membuat kode backup. Untuk impor, tempel kode di sini."></textarea>
+  <div class="row">
+    <button class="small" onclick="ekspor()">Ekspor</button>
+    <button class="small" onclick="impor()">Impor</button>
+  </div>
+</div>
+
+<p class="muted foot">Celengan v1.2.0 beta · by naufallovephone</p>
+
 <script>
 const KEY = 'celengan-data';
 let data = { target: 0, log: [] };
@@ -64,9 +85,10 @@ try { data = JSON.parse(localStorage.getItem(KEY)) || data; } catch (e) {}
 
 const rp = n => 'Rp' + Number(n).toLocaleString('id-ID');
 const simpan = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+const hitungSaldo = log => log.reduce((s, x) => s + x.nominal, 0);
 
 function render() {
-  const saldo = data.log.reduce((s, x) => s + x.nominal, 0);
+  const saldo = hitungSaldo(data.log);
   document.getElementById('saldo').textContent = rp(saldo);
   const pct = data.target > 0 ? Math.min(100, Math.round(saldo / data.target * 100)) : 0;
   document.getElementById('prog').style.width = pct + '%';
@@ -76,29 +98,49 @@ function render() {
   const el = document.getElementById('riwayat');
   el.innerHTML = '';
   if (!data.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; return; }
-  data.log.slice().reverse().forEach(x => {
+  data.log.map((x, i) => ({ x, i })).reverse().forEach(({ x, i }) => {
     const d = document.createElement('div');
     d.className = 'item';
     const kiri = document.createElement('div');
+    kiri.className = 'kiri';
     kiri.innerHTML = '<div></div><div class="muted"></div>';
     kiri.children[0].textContent = x.catatan || (x.nominal > 0 ? 'Nabung' : 'Ambil');
     kiri.children[1].textContent = new Date(x.waktu).toLocaleString('id-ID');
     const kanan = document.createElement('div');
-    kanan.className = x.nominal > 0 ? 'plus' : 'minus';
-    kanan.textContent = (x.nominal > 0 ? '+' : '−') + rp(Math.abs(x.nominal));
+    kanan.className = 'kanan';
+    const nom = document.createElement('span');
+    nom.className = x.nominal > 0 ? 'plus' : 'minus';
+    nom.textContent = (x.nominal > 0 ? '+' : '−') + rp(Math.abs(x.nominal));
+    const hapusBtn = document.createElement('button');
+    hapusBtn.className = 'small';
+    hapusBtn.textContent = '✕';
+    hapusBtn.onclick = () => hapus(i);
+    kanan.append(nom, hapusBtn);
     d.append(kiri, kanan);
     el.appendChild(d);
   });
 }
 
+function cepat(n) {
+  const el = document.getElementById('jumlah');
+  el.value = (parseInt(el.value, 10) || 0) + n;
+}
+
 function tambah(tanda) {
   const n = parseInt(document.getElementById('jumlah').value, 10);
   if (!n || n <= 0) return alert('Isi jumlah yang benar.');
-  const saldo = data.log.reduce((s, x) => s + x.nominal, 0);
-  if (tanda < 0 && n > saldo) return alert('Saldo tidak cukup.');
+  if (tanda < 0 && n > hitungSaldo(data.log)) return alert('Saldo tidak cukup.');
   data.log.push({ nominal: n * tanda, catatan: document.getElementById('catatan').value.trim(), waktu: Date.now() });
   document.getElementById('jumlah').value = '';
   document.getElementById('catatan').value = '';
+  simpan(); render();
+}
+
+function hapus(i) {
+  if (!confirm('Hapus transaksi ini?')) return;
+  const sisa = data.log.filter((_, k) => k !== i);
+  if (hitungSaldo(sisa) < 0) return alert('Tidak bisa dihapus: saldo akan jadi minus.');
+  data.log = sisa;
   simpan(); render();
 }
 
@@ -111,8 +153,31 @@ function reset() {
   if (confirm('Hapus semua data celengan?')) { data = { target: 0, log: [] }; simpan(); render(); }
 }
 
+function ekspor() {
+  const el = document.getElementById('backup');
+  el.value = JSON.stringify(data);
+  el.focus(); el.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  alert('Kode backup sudah dibuat. Salin dan simpan di tempat aman.');
+}
+
+function impor() {
+  const el = document.getElementById('backup');
+  try {
+    const p = JSON.parse(el.value);
+    if (!p || !Array.isArray(p.log)) throw new Error('format');
+    const log = p.log.filter(x => typeof x.nominal === 'number' && isFinite(x.nominal));
+    if (!confirm('Timpa data sekarang dengan data backup?')) return;
+    data = { target: Number(p.target) || 0, log: log };
+    simpan(); render();
+    el.value = '';
+    alert('Impor berhasil.');
+  } catch (e) {
+    alert('Kode backup tidak valid.');
+  }
+}
+
 render();
 </script>
-<p class="muted" style="text-align:center;margin-top:24px">by naufallovephone</p>
 </body>
 </html>
