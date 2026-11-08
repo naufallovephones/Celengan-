@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Senyap</title>
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --text:#1d2433; --muted:#6b7385; --main:#16a34a; --line:#e5e7ef; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f131a; --card:#1a1f2b; --text:#eef0f6; --muted:#98a0b3; --line:#2a3142; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 18px 40px; }
+  .logo { text-align:center; font-size:30px; font-weight:800; margin:44px 0 6px; animation:naik .6s both; }
+  .logo span { display:inline-block; animation:goyang 3s ease-in-out infinite; }
+  .sub { text-align:center; color:var(--muted); font-size:14px; margin-bottom:24px; animation:naik .6s .15s both; }
+  input[type=search] { width:100%; padding:15px 18px; border-radius:99px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; outline:none; animation:naik .6s .3s both; }
+  input[type=search]:focus { border-color:var(--main); }
+  .btn { width:100%; margin-top:12px; padding:13px; border:0; border-radius:99px; background:var(--main); color:#fff; font-size:16px; font-weight:700; }
+  .btn:active { transform:scale(.97); }
+  h3 { font-size:14px; color:var(--muted); margin:28px 0 10px; display:flex; justify-content:space-between; align-items:center; }
+  h3 button { border:0; background:var(--line); color:var(--muted); border-radius:10px; padding:5px 10px; font-size:12px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .tile { position:relative; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 6px; text-align:center; font-size:13px; color:var(--text); word-break:break-word; }
+  .tile b { display:block; font-size:22px; margin-bottom:4px; }
+  .tile.tambah { color:var(--main); border-style:dashed; }
+  .tile .x { position:absolute; top:4px; right:6px; color:#dc2626; font-weight:700; }
+  .set { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:6px 14px; margin-top:8px; }
+  .set label { display:flex; justify-content:space-between; align-items:center; padding:10px 0; font-size:15px; border-bottom:1px solid var(--line); }
+  .set label:last-child { border-bottom:0; }
+  .set input { width:20px; height:20px; accent-color:var(--main); }
+  .api { width:100%; margin-top:18px; padding:14px; border:0; border-radius:16px; background:#dc2626; color:#fff; font-size:16px; font-weight:700; }
+  .api:active { transform:scale(.97); }
+  .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:28px; }
+  .jatuh { position:fixed; top:-40px; z-index:99; pointer-events:none; animation:jatuh 1.2s ease-in forwards; }
+  @keyframes naik { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  @keyframes goyang { 0%,100% { transform:rotate(-8deg); } 50% { transform:rotate(8deg); } }
+  @keyframes jatuh { to { transform:translateY(115vh) rotate(300deg); } }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="logo"><span>🕶️</span> Senyap</div>
+<div class="sub">Browser privat sederhana</div>
+
+<form onsubmit="return cari(event)">
+  <input id="q" type="search" placeholder="Cari atau ketik alamat situs" autocomplete="off" autocapitalize="off" enterkeyhint="go">
+  <button class="btn" type="submit">Cari</button>
+</form>
+
+<h3>Favorit <button id="btnUbah" onclick="ubah()">Ubah</button></h3>
+<div class="grid" id="grid"></div>
+
+<h3>Pengaturan</h3>
+<div class="set">
+  <label>Paksa HTTPS <input type="checkbox" id="sHttps" onchange="simpanSet()"></label>
+  <label>Bersihkan cookie tiap buka halaman <input type="checkbox" id="sBersih" onchange="simpanSet()"></label>
+</div>
+
+<button class="api" onclick="bakar()">🔥 Bakar semua data</button>
+<div class="foot">Senyap v1.0.0 · by naufallovephone</div>
+
+<script>
+const FKEY = 'senyap-fav', SKEY = 'senyap-set';
+const SEARCH = 'https://duckduckgo.com/?q=';
+let fav = [['Wikipedia', 'https://wikipedia.org'], ['GitHub', 'https://github.com'], ['DuckDuckGo', 'https://duckduckgo.com']];
+try { const f = JSON.parse(localStorage.getItem(FKEY)); if (Array.isArray(f)) fav = f; } catch (e) {}
+let set = { https: true, bersih: true };
+try { Object.assign(set, JSON.parse(localStorage.getItem(SKEY)) || {}); } catch (e) {}
+let edit = false;
+const $ = id => document.getElementById(id);
+
+function adalahUrl(t) {
+  if (/^https?:\/\//i.test(t)) return t;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(t)) return null;
+  if (!/\s/.test(t) && /\.[a-z]{2,}(\/|$|\?|:)/i.test(t)) return 'https://' + t;
+  return null;
+}
+
+function normal(teks) {
+  teks = teks.trim();
+  if (!teks) return null;
+  let url = adalahUrl(teks) || (SEARCH + encodeURIComponent(teks));
+  if (set.https) url = url.replace(/^http:\/\//i, 'https://');
+  return url;
+}
+
+function buka(url) {
+  let opts = 'location=yes,hidenavigationbuttons=no,zoom=yes,closebuttoncaption=Tutup,toolbarcolor=#16a34a,closebuttoncolor=#ffffff,navigationbuttoncolor=#ffffff';
+  if (set.bersih) opts += ',clearcache=yes,clearsessioncache=yes';
+  const ib = (window.cordova && window.cordova.InAppBrowser) ? window.cordova.InAppBrowser : window;
+  ib.open(url, '_blank', opts);
+}
+
+function cari(e) {
+  e.preventDefault();
+  const url = normal($('q').value);
+  if (url) { buka(url); $('q').value = ''; }
+  return false;
+}
+
+function simpanFav() { try { localStorage.setItem(FKEY, JSON.stringify(fav)); } catch (e) {} }
+function simpanSet() {
+  set.https = $('sHttps').checked; set.bersih = $('sBersih').checked;
+  try { localStorage.setItem(SKEY, JSON.stringify(set)); } catch (e) {}
+}
+
+function render() {
+  $('sHttps').checked = set.https; $('sBersih').checked = set.bersih;
+  $('btnUbah').textContent = edit ? 'Selesai' : 'Ubah';
+  const g = $('grid'); g.innerHTML = '';
+  fav.forEach(([nama, url], i) => {
+    const t = document.createElement('div');
+    t.className = 'tile';
+    const b = document.createElement('b'); b.textContent = '🌐';
+    const n = document.createElement('span'); n.textContent = nama;
+    t.append(b, n);
+    if (edit) {
+      const x = document.createElement('span'); x.className = 'x'; x.textContent = '✕';
+      t.appendChild(x);
+      t.onclick = () => { fav.splice(i, 1); simpanFav(); render(); };
+    } else {
+      t.onclick = () => buka(set.https ? url.replace(/^http:\/\//i, 'https://') : url);
+    }
+    g.appendChild(t);
+  });
+  const tb = document.createElement('div');
+  tb.className = 'tile tambah';
+  tb.innerHTML = '<b>＋</b><span>Tambah</span>';
+  tb.onclick = tambahFav;
+  g.appendChild(tb);
+}
+
+function ubah() { edit = !edit; render(); }
+
+function tambahFav() {
+  const u = prompt('Alamat situs (contoh: kompas.com)');
+  if (!u) return;
+  const url = adalahUrl(u.trim());
+  if (!url) return alert('Alamat tidak valid.');
+  let host = url;
+  try { host = new URL(url).hostname.replace(/^www\./, ''); } catch (e) {}
+  const nama = prompt('Nama favorit', host) || host;
+  fav.push([nama.slice(0, 20), url]);
+  simpanFav(); render();
+}
+
+function api() {
+  for (let i = 0; i < 24; i++) {
+    const s = document.createElement('span');
+    s.className = 'jatuh';
+    s.textContent = '🔥';
+    s.style.left = Math.random() * 95 + 'vw';
+    s.style.animationDelay = Math.random() * 0.5 + 's';
+    s.style.fontSize = 18 + Math.random() * 18 + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2000);
+  }
+}
+
+function bakar() {
+  if (!confirm('Hapus cookie, cache, dan semua favorit?')) return;
+  try {
+    const ib = (window.cordova && window.cordova.InAppBrowser) ? window.cordova.InAppBrowser : window;
+    const r = ib.open('about:blank', '_blank', 'hidden=yes,clearcache=yes,clearsessioncache=yes');
+    setTimeout(() => { try { r.close(); } catch (e) {} }, 800);
+  } catch (e) {}
+  fav = []; simpanFav(); $('q').value = '';
+  render(); api();
+}
+
+render();
+</script>
+</body>
+</html>
