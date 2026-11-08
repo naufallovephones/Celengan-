@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Celengan</title>
+<style>
+  :root { --bg:#f6f7fb; --card:#fff; --text:#1d2433; --muted:#6b7385; --main:#16a34a; --red:#dc2626; --line:#e5e7ef; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#10131a; --card:#1a1f2b; --text:#eef0f6; --muted:#98a0b3; --line:#2a3142; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 16px 40px; }
+  h1 { font-size:20px; margin:20px 0 12px; }
+  .card { background:var(--card); border-radius:16px; padding:16px; margin-bottom:14px; border:1px solid var(--line); }
+  .saldo { font-size:32px; font-weight:700; color:var(--main); }
+  .muted { color:var(--muted); font-size:13px; }
+  .bar { height:10px; background:var(--line); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
+  .bar > div { height:100%; background:var(--main); width:0; transition:width .3s; }
+  input { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; }
+  .row { display:flex; gap:8px; }
+  button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); }
+  button.out { background:var(--red); }
+  button.small { flex:none; padding:6px 10px; font-size:12px; background:var(--line); color:var(--muted); }
+  .item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+  .item:last-child { border-bottom:0; }
+  .plus { color:var(--main); font-weight:600; } .minus { color:var(--red); font-weight:600; }
+</style>
+</head>
+<body>
+<h1>🐷 Celengan</h1>
+
+<div class="card">
+  <div class="muted">Saldo tabungan</div>
+  <div class="saldo" id="saldo">Rp0</div>
+  <div class="bar"><div id="prog"></div></div>
+  <div class="muted" id="targetInfo">Belum ada target</div>
+</div>
+
+<div class="card">
+  <input id="target" type="number" inputmode="numeric" placeholder="Target tabungan (Rp)">
+  <button class="small" style="width:100%" onclick="setTarget()">Simpan target</button>
+</div>
+
+<div class="card">
+  <input id="jumlah" type="number" inputmode="numeric" placeholder="Jumlah (Rp)">
+  <input id="catatan" type="text" placeholder="Catatan (opsional)">
+  <div class="row">
+    <button onclick="tambah(1)">+ Nabung</button>
+    <button class="out" onclick="tambah(-1)">− Ambil</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="muted" style="margin-bottom:6px">Riwayat</div>
+  <div id="riwayat"></div>
+  <button class="small" style="width:100%;margin-top:10px" onclick="reset()">Hapus semua data</button>
+</div>
+
+<script>
+const KEY = 'celengan-data';
+let data = { target: 0, log: [] };
+try { data = JSON.parse(localStorage.getItem(KEY)) || data; } catch (e) {}
+
+const rp = n => 'Rp' + Number(n).toLocaleString('id-ID');
+const simpan = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+
+function render() {
+  const saldo = data.log.reduce((s, x) => s + x.nominal, 0);
+  document.getElementById('saldo').textContent = rp(saldo);
+  const pct = data.target > 0 ? Math.min(100, Math.round(saldo / data.target * 100)) : 0;
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('targetInfo').textContent = data.target > 0
+    ? pct + '% dari ' + rp(data.target) + (saldo >= data.target ? ' 🎉 Tercapai!' : ' (kurang ' + rp(data.target - saldo) + ')')
+    : 'Belum ada target';
+  const el = document.getElementById('riwayat');
+  el.innerHTML = '';
+  if (!data.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; return; }
+  data.log.slice().reverse().forEach(x => {
+    const d = document.createElement('div');
+    d.className = 'item';
+    const kiri = document.createElement('div');
+    kiri.innerHTML = '<div></div><div class="muted"></div>';
+    kiri.children[0].textContent = x.catatan || (x.nominal > 0 ? 'Nabung' : 'Ambil');
+    kiri.children[1].textContent = new Date(x.waktu).toLocaleString('id-ID');
+    const kanan = document.createElement('div');
+    kanan.className = x.nominal > 0 ? 'plus' : 'minus';
+    kanan.textContent = (x.nominal > 0 ? '+' : '−') + rp(Math.abs(x.nominal));
+    d.append(kiri, kanan);
+    el.appendChild(d);
+  });
+}
+
+function tambah(tanda) {
+  const n = parseInt(document.getElementById('jumlah').value, 10);
+  if (!n || n <= 0) return alert('Isi jumlah yang benar.');
+  const saldo = data.log.reduce((s, x) => s + x.nominal, 0);
+  if (tanda < 0 && n > saldo) return alert('Saldo tidak cukup.');
+  data.log.push({ nominal: n * tanda, catatan: document.getElementById('catatan').value.trim(), waktu: Date.now() });
+  document.getElementById('jumlah').value = '';
+  document.getElementById('catatan').value = '';
+  simpan(); render();
+}
+
+function setTarget() {
+  data.target = parseInt(document.getElementById('target').value, 10) || 0;
+  simpan(); render();
+}
+
+function reset() {
+  if (confirm('Hapus semua data celengan?')) { data = { target: 0, log: [] }; simpan(); render(); }
+}
+
+render();
+</script>
+</body>
+</html>
