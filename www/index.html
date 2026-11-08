@@ -5,46 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Celengan</title>
 <style>
-  :root { --bg:#f6f7fb; --card:#fff; --text:#1d2433; --muted:#6b7385; --main:#16a34a; --red:#dc2626; --line:#e5e7ef; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#10131a; --card:#1a1f2b; --text:#eef0f6; --muted:#98a0b3; --line:#2a3142; }
-  }
+  :root { --bg:#f4f6fb; --card:#fff; --text:#1d2433; --muted:#6b7385; --main:#16a34a; --main2:#4ade80; --red:#dc2626; --line:#e5e7ef; }
+  html[data-tema=biru] { --main:#2563eb; --main2:#60a5fa; }
+  html[data-tema=ungu] { --main:#7c3aed; --main2:#c084fc; }
+  html[data-tema=oranye] { --main:#ea580c; --main2:#fbbf24; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f131a; --card:#1a1f2b; --text:#eef0f6; --muted:#98a0b3; --line:#2a3142; } }
   * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 16px 40px; }
+  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:env(safe-area-inset-top) 16px 40px; transition:background .3s; }
   h1 { font-size:20px; margin:20px 0 12px; }
-  .card { background:var(--card); border-radius:16px; padding:16px; margin-bottom:14px; border:1px solid var(--line); }
-  .saldo { font-size:32px; font-weight:700; color:var(--main); }
+  .card { background:var(--card); border-radius:18px; padding:16px; margin-bottom:14px; border:1px solid var(--line); animation:naik .5s both; }
+  .hero { background:linear-gradient(135deg,var(--main),var(--main2)); color:#fff; border:0; }
+  .hero .muted { color:rgba(255,255,255,.85); }
+  .saldo { font-size:34px; font-weight:800; }
   .muted { color:var(--muted); font-size:13px; }
-  .bar { height:10px; background:var(--line); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
-  .bar > div { height:100%; background:var(--main); width:0; transition:width .3s; }
+  .bar { height:10px; background:rgba(255,255,255,.3); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
+  .bar > div { height:100%; background:#fff; width:0; transition:width .6s; }
   input, textarea { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; font-family:inherit; }
-  .row { display:flex; gap:8px; }
-  button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); }
+  .row, .quick { display:flex; gap:8px; }
+  button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); transition:transform .1s; }
+  button:active { transform:scale(.96); }
   button.out { background:var(--red); }
-  button.small { flex:none; padding:6px 10px; font-size:12px; background:var(--line); color:var(--muted); }
-  .quick { display:flex; gap:6px; margin-bottom:8px; }
-  .quick button { padding:8px 4px; font-size:13px; }
-  .item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); }
+  button.small { flex:none; padding:7px 11px; font-size:13px; background:var(--line); color:var(--muted); }
+  .quick { margin-bottom:8px; } .quick button { flex:1; }
+  .dots { display:flex; gap:12px; margin:8px 0; }
+  .dot { width:34px; height:34px; border-radius:50%; padding:0; flex:none; border:3px solid transparent; }
+  .dot.on { border-color:var(--text); }
+  .item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); animation:naik .35s both; }
   .item:last-child { border-bottom:0; }
-  .item .kiri { flex:1; }
-  .item .kanan { display:flex; align-items:center; gap:8px; }
-  .plus { color:var(--main); font-weight:600; } .minus { color:var(--red); font-weight:600; }
+  .item .kiri { flex:1; } .kanan { display:flex; align-items:center; gap:8px; }
+  .plus { color:var(--main); font-weight:700; } .minus { color:var(--red); font-weight:700; }
   .foot { text-align:center; margin-top:24px; }
+  #splash { position:fixed; inset:0; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(160deg,var(--main),var(--main2)); color:#fff; text-align:center; transition:opacity .5s, transform .5s; overflow:hidden; }
+  #splash.hide { opacity:0; transform:scale(1.15); pointer-events:none; }
+  .babi { font-size:100px; animation:pantul 1s ease-in-out infinite; }
+  #splash h2 { margin:10px 0 4px; font-size:24px; animation:naik .8s .3s both; }
+  #splash p { margin:0; opacity:.9; animation:naik .8s .6s both; }
+  #splash small { position:absolute; bottom:40px; opacity:.7; }
+  .jatuh { position:fixed; top:-40px; z-index:120; pointer-events:none; animation:jatuh 1.4s ease-in forwards; }
+  @keyframes naik { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  @keyframes pantul { 0%,100% { transform:translateY(0) rotate(-6deg); } 50% { transform:translateY(-24px) rotate(6deg); } }
+  @keyframes jatuh { to { transform:translateY(115vh) rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
+
+<div id="splash" onclick="tutupSplash()">
+  <div class="babi">🐷</div>
+  <h2 id="salam"></h2>
+  <p>Ayo nabung hari ini!</p>
+  <small>Ketuk untuk lanjut</small>
+</div>
+
 <h1>🐷 Celengan</h1>
 
-<div class="card">
-  <div class="muted">Saldo tabungan</div>
+<div class="card hero">
+  <div class="muted" id="sapa">Saldo tabungan</div>
   <div class="saldo" id="saldo">Rp0</div>
   <div class="bar"><div id="prog"></div></div>
   <div class="muted" id="targetInfo">Belum ada target</div>
-</div>
-
-<div class="card">
-  <input id="target" type="number" inputmode="numeric" placeholder="Target tabungan (Rp)">
-  <button class="small" style="width:100%" onclick="setTarget()">Simpan target</button>
 </div>
 
 <div class="card">
@@ -62,9 +81,23 @@
 </div>
 
 <div class="card">
+  <div class="muted">Statistik</div>
+  <div id="stat" style="margin-top:6px"></div>
+</div>
+
+<div class="card">
   <div class="muted" style="margin-bottom:6px">Riwayat</div>
   <div id="riwayat"></div>
   <button class="small" style="width:100%;margin-top:10px" onclick="reset()">Hapus semua data</button>
+</div>
+
+<div class="card">
+  <div class="muted">Pengaturan</div>
+  <input id="nama" type="text" placeholder="Nama panggilan" style="margin-top:8px" onchange="setNama()">
+  <input id="target" type="number" inputmode="numeric" placeholder="Target tabungan (Rp)">
+  <button class="small" style="width:100%" onclick="setTarget()">Simpan target</button>
+  <div class="muted" style="margin-top:12px">Tema</div>
+  <div class="dots" id="dots"></div>
 </div>
 
 <div class="card">
@@ -76,26 +109,69 @@
   </div>
 </div>
 
-<p class="muted foot">Celengan v1.2.0 beta · by naufallovephone</p>
+<p class="muted foot">Celengan v4.0.0 · by naufallovephone</p>
 
 <script>
 const KEY = 'celengan-data';
-let data = { target: 0, log: [] };
-try { data = JSON.parse(localStorage.getItem(KEY)) || data; } catch (e) {}
+const TEMA = [['hijau','#16a34a'],['biru','#2563eb'],['ungu','#7c3aed'],['oranye','#ea580c']];
+let data = { target: 0, log: [], tema: 'hijau', nama: '' };
+try { data = Object.assign(data, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
 
+const $ = id => document.getElementById(id);
 const rp = n => 'Rp' + Number(n).toLocaleString('id-ID');
 const simpan = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
-const hitungSaldo = log => log.reduce((s, x) => s + x.nominal, 0);
+const hitung = log => log.reduce((s, x) => s + x.nominal, 0);
+
+let tampil = 0;
+function animSaldo(to) {
+  const from = tampil, t0 = performance.now();
+  (function f(t) {
+    const k = Math.min(1, (t - t0) / 700);
+    tampil = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    $('saldo').textContent = rp(tampil);
+    if (k < 1) requestAnimationFrame(f);
+  })(t0);
+}
+
+function hujan(emoji, n) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'jatuh';
+    s.textContent = emoji[i % emoji.length];
+    s.style.left = Math.random() * 95 + 'vw';
+    s.style.animationDelay = Math.random() * 0.5 + 's';
+    s.style.fontSize = 18 + Math.random() * 16 + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2200);
+  }
+}
 
 function render() {
-  const saldo = hitungSaldo(data.log);
-  document.getElementById('saldo').textContent = rp(saldo);
+  document.documentElement.dataset.tema = data.tema;
+  const saldo = hitung(data.log);
+  animSaldo(saldo);
+  $('sapa').textContent = data.nama ? 'Saldo tabungan ' + data.nama : 'Saldo tabungan';
   const pct = data.target > 0 ? Math.min(100, Math.round(saldo / data.target * 100)) : 0;
-  document.getElementById('prog').style.width = pct + '%';
-  document.getElementById('targetInfo').textContent = data.target > 0
+  $('prog').style.width = pct + '%';
+  $('targetInfo').textContent = data.target > 0
     ? pct + '% dari ' + rp(data.target) + (saldo >= data.target ? ' 🎉 Tercapai!' : ' (kurang ' + rp(data.target - saldo) + ')')
     : 'Belum ada target';
-  const el = document.getElementById('riwayat');
+  const masuk = data.log.filter(x => x.nominal > 0).reduce((s, x) => s + x.nominal, 0);
+  const keluar = data.log.filter(x => x.nominal < 0).reduce((s, x) => s - x.nominal, 0);
+  $('stat').innerHTML = '<span class="plus"></span> total masuk<br><span class="minus"></span> total diambil<br><span class="muted"></span>';
+  $('stat').children[0].textContent = rp(masuk);
+  $('stat').children[1].textContent = rp(keluar);
+  $('stat').children[2].textContent = data.log.length + ' transaksi';
+  $('nama').value = data.nama;
+  $('dots').innerHTML = '';
+  TEMA.forEach(([k, c]) => {
+    const b = document.createElement('button');
+    b.className = 'dot' + (k === data.tema ? ' on' : '');
+    b.style.background = c;
+    b.onclick = () => { data.tema = k; simpan(); render(); };
+    $('dots').appendChild(b);
+  });
+  const el = $('riwayat');
   el.innerHTML = '';
   if (!data.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; return; }
   data.log.map((x, i) => ({ x, i })).reverse().forEach(({ x, i }) => {
@@ -111,50 +187,44 @@ function render() {
     const nom = document.createElement('span');
     nom.className = x.nominal > 0 ? 'plus' : 'minus';
     nom.textContent = (x.nominal > 0 ? '+' : '−') + rp(Math.abs(x.nominal));
-    const hapusBtn = document.createElement('button');
-    hapusBtn.className = 'small';
-    hapusBtn.textContent = '✕';
-    hapusBtn.onclick = () => hapus(i);
-    kanan.append(nom, hapusBtn);
+    const h = document.createElement('button');
+    h.className = 'small';
+    h.textContent = '✕';
+    h.onclick = () => hapus(i);
+    kanan.append(nom, h);
     d.append(kiri, kanan);
     el.appendChild(d);
   });
 }
 
-function cepat(n) {
-  const el = document.getElementById('jumlah');
-  el.value = (parseInt(el.value, 10) || 0) + n;
-}
+function cepat(n) { $('jumlah').value = (parseInt($('jumlah').value, 10) || 0) + n; }
 
 function tambah(tanda) {
-  const n = parseInt(document.getElementById('jumlah').value, 10);
+  const n = parseInt($('jumlah').value, 10);
   if (!n || n <= 0) return alert('Isi jumlah yang benar.');
-  if (tanda < 0 && n > hitungSaldo(data.log)) return alert('Saldo tidak cukup.');
-  data.log.push({ nominal: n * tanda, catatan: document.getElementById('catatan').value.trim(), waktu: Date.now() });
-  document.getElementById('jumlah').value = '';
-  document.getElementById('catatan').value = '';
+  const sebelum = hitung(data.log);
+  if (tanda < 0 && n > sebelum) return alert('Saldo tidak cukup.');
+  data.log.push({ nominal: n * tanda, catatan: $('catatan').value.trim(), waktu: Date.now() });
+  $('jumlah').value = ''; $('catatan').value = '';
   simpan(); render();
+  if (tanda > 0) hujan(['🪙'], 10);
+  const sesudah = sebelum + n * tanda;
+  if (data.target > 0 && sebelum < data.target && sesudah >= data.target) setTimeout(() => hujan(['🎉', '✨', '🎊'], 36), 500);
 }
 
 function hapus(i) {
   if (!confirm('Hapus transaksi ini?')) return;
   const sisa = data.log.filter((_, k) => k !== i);
-  if (hitungSaldo(sisa) < 0) return alert('Tidak bisa dihapus: saldo akan jadi minus.');
-  data.log = sisa;
-  simpan(); render();
+  if (hitung(sisa) < 0) return alert('Tidak bisa dihapus: saldo akan jadi minus.');
+  data.log = sisa; simpan(); render();
 }
 
-function setTarget() {
-  data.target = parseInt(document.getElementById('target').value, 10) || 0;
-  simpan(); render();
-}
-
-function reset() {
-  if (confirm('Hapus semua data celengan?')) { data = { target: 0, log: [] }; simpan(); render(); }
-}
+function setTarget() { data.target = parseInt($('target').value, 10) || 0; simpan(); render(); }
+function setNama() { data.nama = $('nama').value.trim().slice(0, 20); simpan(); render(); }
+function reset() { if (confirm('Hapus semua data celengan?')) { data.target = 0; data.log = []; simpan(); render(); } }
 
 function ekspor() {
-  const el = document.getElementById('backup');
+  const el = $('backup');
   el.value = JSON.stringify(data);
   el.focus(); el.select();
   try { document.execCommand('copy'); } catch (e) {}
@@ -162,22 +232,27 @@ function ekspor() {
 }
 
 function impor() {
-  const el = document.getElementById('backup');
   try {
-    const p = JSON.parse(el.value);
+    const p = JSON.parse($('backup').value);
     if (!p || !Array.isArray(p.log)) throw new Error('format');
-    const log = p.log.filter(x => typeof x.nominal === 'number' && isFinite(x.nominal));
     if (!confirm('Timpa data sekarang dengan data backup?')) return;
-    data = { target: Number(p.target) || 0, log: log };
-    simpan(); render();
-    el.value = '';
+    data.log = p.log.filter(x => typeof x.nominal === 'number' && isFinite(x.nominal));
+    data.target = Number(p.target) || 0;
+    if (TEMA.some(t => t[0] === p.tema)) data.tema = p.tema;
+    data.nama = String(p.nama || '').slice(0, 20);
+    simpan(); render(); $('backup').value = '';
     alert('Impor berhasil.');
-  } catch (e) {
-    alert('Kode backup tidak valid.');
-  }
+  } catch (e) { alert('Kode backup tidak valid.'); }
 }
 
+function tutupSplash() { $('splash').classList.add('hide'); setTimeout(() => $('splash').remove(), 600); }
+
+const jam = new Date().getHours();
+const waktu = jam < 11 ? 'pagi' : jam < 15 ? 'siang' : jam < 18 ? 'sore' : 'malam';
+$('salam').textContent = 'Selamat ' + waktu + (data.nama ? ', ' + data.nama : '') + '!';
 render();
+setTimeout(() => { if ($('splash')) hujan(['🪙'], 12); }, 300);
+setTimeout(() => { if ($('splash')) tutupSplash(); }, 3000);
 </script>
 </body>
 </html>
