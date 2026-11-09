@@ -15,12 +15,13 @@
   h1 { font-size:20px; margin:20px 0 12px; }
   .card { background:var(--card); border-radius:18px; padding:16px; margin-bottom:14px; border:1px solid var(--line); animation:naik .5s both; }
   .hero { background:linear-gradient(135deg,var(--main),var(--main2)); color:#fff; border:0; }
-  .hero .muted { color:rgba(255,255,255,.85); }
+  .hero .muted { color:rgba(255,255,255,.88); }
   .saldo { font-size:34px; font-weight:800; }
   .muted { color:var(--muted); font-size:13px; }
   .bar { height:10px; background:rgba(255,255,255,.3); border-radius:99px; overflow:hidden; margin:10px 0 6px; }
   .bar > div { height:100%; background:#fff; width:0; transition:width .6s; }
   input, textarea, select { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:16px; margin-bottom:8px; font-family:inherit; }
+  input[type=checkbox] { width:22px; height:22px; margin:0; accent-color:var(--main); }
   .row, .quick { display:flex; gap:8px; }
   button { flex:1; padding:12px; border:0; border-radius:12px; font-size:16px; font-weight:600; color:#fff; background:var(--main); transition:transform .1s; }
   button:active { transform:scale(.96); }
@@ -31,6 +32,7 @@
   .dot { width:34px; height:34px; border-radius:50%; padding:0; flex:none; border:3px solid transparent; }
   .dot.on { border-color:var(--text); }
   .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .opsi { display:flex; justify-content:space-between; align-items:center; padding:6px 0 10px; font-size:15px; }
   #chips { display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; padding-bottom:4px; }
   .chip { flex:none; padding:9px 15px; border-radius:99px; background:var(--card); border:1px solid var(--line); color:var(--text); font-size:14px; }
   .chip.on { background:var(--main); color:#fff; border-color:transparent; }
@@ -39,6 +41,17 @@
   .bw { flex:1; width:100%; display:flex; align-items:flex-end; }
   .bw div { width:100%; border-radius:8px 8px 0 0; background:linear-gradient(var(--main2),var(--main)); transition:height .6s; }
   .lbl { font-size:11px; color:var(--muted); margin-top:4px; }
+  .tg { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-top:10px; }
+  .cell { flex:none; padding:9px 0; border-radius:10px; background:var(--line); color:var(--muted); font-size:12px; font-weight:600; }
+  .cell.ok { background:var(--main); color:#fff; }
+  .bdg { display:flex; gap:10px; overflow-x:auto; padding-top:8px; }
+  .bd { flex:none; width:80px; text-align:center; font-size:11px; color:var(--muted); }
+  .bd i { display:block; font-style:normal; font-size:30px; width:54px; height:54px; line-height:54px; border-radius:50%; background:var(--line); margin:0 auto 4px; filter:grayscale(1); opacity:.5; }
+  .bd.on i { filter:none; opacity:1; background:linear-gradient(135deg,var(--main2),var(--main)); }
+  .bd.on { color:var(--text); }
+  #kosong { display:none; text-align:center; padding:26px 10px 30px; }
+  #kosong svg { width:150px; margin-bottom:8px; }
+  #kosong h2 { margin:6px 0; font-size:22px; }
   .item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid var(--line); animation:naik .35s both; }
   .item:last-child { border-bottom:0; }
   .item .kiri { flex:1; } .kanan { display:flex; align-items:center; gap:8px; }
@@ -53,7 +66,7 @@
   #lock { z-index:200; gap:10px; }
   #lock input { width:200px; text-align:center; font-size:28px; letter-spacing:12px; border-radius:16px; }
   #lock button { flex:none; width:200px; background:rgba(255,255,255,.25); }
-  .babi { font-size:100px; animation:pantul 1s ease-in-out infinite; }
+  .logo { font-size:100px; animation:pantul 1s ease-in-out infinite; }
   #splash h2 { margin:10px 0 4px; font-size:24px; animation:naik .8s .3s both; }
   #splash p { margin:0; opacity:.9; animation:naik .8s .6s both; }
   #splash small { position:absolute; bottom:40px; opacity:.7; }
@@ -75,21 +88,30 @@
 </div>
 
 <div id="splash" onclick="tutupSplash()">
-  <div class="babi">🐷</div>
+  <div class="logo">💰</div>
   <h2 id="salam"></h2>
   <p>NabungYuk, ayo nabung hari ini!</p>
   <small>Ketuk untuk lanjut</small>
 </div>
 
-<h1>🐷 NabungYuk</h1>
+<h1>💰 NabungYuk</h1>
 <div id="banner"><span id="bannerTeks"></span><button class="small" onclick="tutupBanner()">Tutup</button></div>
 <div id="chips"></div>
 
+<div id="kosong" class="card">
+  <svg viewBox="0 0 120 100"><ellipse cx="60" cy="86" rx="40" ry="8" fill="#00000018"/><ellipse cx="60" cy="74" rx="30" ry="9" fill="#b47a0a"/><rect x="30" y="62" width="60" height="12" fill="#d99a0a"/><ellipse cx="60" cy="62" rx="30" ry="9" fill="#fbbf24"/><ellipse cx="60" cy="48" rx="26" ry="8" fill="#b47a0a"/><rect x="34" y="38" width="52" height="10" fill="#d99a0a"/><ellipse cx="60" cy="38" rx="26" ry="8" fill="#fbbf24"/><ellipse cx="60" cy="26" rx="22" ry="7" fill="#fcd34d"/></svg>
+  <h2>Kamu belum nabung, NabungYuk!</h2>
+  <p class="muted">Buat celengan pertamamu dan mulai menabung hari ini.</p>
+  <button style="width:100%;margin-top:10px" onclick="tambahCelengan()">＋ Buat celengan</button>
+</div>
+
+<div id="utama">
 <div class="card hero">
   <div class="muted" id="sapa">Saldo tabungan</div>
   <div class="saldo" id="saldo">0</div>
   <div class="bar"><div id="prog"></div></div>
   <div class="muted" id="targetInfo">Belum ada target</div>
+  <div class="muted" id="kalk" style="margin-top:6px"></div>
   <div class="muted" id="totalInfo" style="margin-top:6px"></div>
 </div>
 
@@ -104,9 +126,15 @@
 </div>
 
 <div class="card">
+  <div class="head"><div class="muted">Tantangan nabung</div><button class="small" id="tanBtn" onclick="aturTantangan()">Mulai</button></div>
+  <div class="muted" id="tanInfo"></div>
+  <div class="tg" id="tanGrid"></div>
+</div>
+
+<div class="card">
   <div class="muted">Grafik nabung 6 bulan terakhir</div>
   <div class="chart" id="chart"></div>
-  <div id="stat" style="margin-top:12px"></div>
+  <div style="margin-top:12px"><span class="plus" id="stMasuk"></span> total masuk<br><span class="minus" id="stKeluar"></span> total diambil<br><span class="muted" id="stJumlah"></span></div>
 </div>
 
 <div class="card">
@@ -121,11 +149,22 @@
 <div class="card">
   <div class="muted">Celengan ini</div>
   <input id="target" type="number" step="any" inputmode="decimal" placeholder="Target tabungan" style="margin-top:8px">
+  <div class="muted" style="margin-bottom:4px">Tanggal target (opsional)</div>
+  <input id="tgl" type="date">
   <button class="small" style="width:100%;margin-bottom:8px" onclick="setTarget()">Simpan target</button>
-  <div class="row" style="margin-bottom:12px">
+  <div class="row">
     <button class="small" onclick="ubahCelengan()">Ubah nama</button>
     <button class="small" onclick="hapusCelengan()">Hapus celengan</button>
   </div>
+</div>
+</div>
+
+<div class="card">
+  <div class="muted">Lencana</div>
+  <div class="bdg" id="bdg"></div>
+</div>
+
+<div class="card">
   <div class="muted">Pengaturan umum</div>
   <input id="nama" type="text" placeholder="Nama panggilan" style="margin-top:8px" onchange="setNama()">
   <select id="cur" onchange="setCur()">
@@ -144,6 +183,9 @@
     <option value="7">Pengingat: setiap minggu</option>
     <option value="30">Pengingat: setiap bulan</option>
   </select>
+  <div class="muted" style="margin-bottom:4px">Jam pengingat</div>
+  <input id="jam" type="time" onchange="setJam()">
+  <div class="opsi"><span>Efek suara</span><input id="suara" type="checkbox" onchange="setSuara()"></div>
   <button class="small" id="btnPin" style="width:100%" onclick="aturPin()">Pasang PIN</button>
   <div class="muted" style="margin-top:12px">Tema</div>
   <div class="dots" id="dots"></div>
@@ -158,7 +200,7 @@
   </div>
 </div>
 
-<p class="muted foot">NabungYuk v6.7.0 · by naufallovephone</p>
+<p class="muted foot">NabungYuk v7.0.0 · by naufallovephone</p>
 <div id="toast"><span id="toastTeks"></span><button onclick="urungkan()">Urungkan</button></div>
 
 <script>
@@ -166,18 +208,18 @@ const KEY = 'celengan-data', UKEY = 'nabungyuk-undo';
 const TEMA = [['hijau','#16a34a'],['biru','#2563eb'],['ungu','#7c3aed'],['oranye','#ea580c']];
 const CURS = ['IDR','USD','EUR','SGD','MYR','JPY','GBP','AUD'];
 const valid = x => x && typeof x.nominal === 'number' && isFinite(x.nominal);
-let data = { celengan: [], aktif: 0, tema: 'hijau', nama: '', cur: 'IDR', remind: 0, pin: '' };
-try {
-  const raw = JSON.parse(localStorage.getItem(KEY));
-  if (raw) {
-    if (Array.isArray(raw.celengan)) Object.assign(data, raw);
-    else {
-      data.celengan = [{ id: 1, nama: 'Utama', emoji: '🐷', target: Number(raw.target) || 0, log: Array.isArray(raw.log) ? raw.log : [] }];
-      ['tema', 'nama', 'cur', 'remind'].forEach(k => { if (raw[k] !== undefined) data[k] = raw[k]; });
-    }
+function baru(nama, emoji) { return { id: Date.now() + Math.floor(Math.random() * 1000), nama: nama, emoji: emoji, target: 0, tanggal: '', tantangan: null, log: [] }; }
+let data = { celengan: [], aktif: 0, tema: 'hijau', nama: '', cur: 'IDR', remind: 0, jam: '19:00', suara: true, pin: '' };
+let raw = null;
+try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+if (raw) {
+  if (Array.isArray(raw.celengan)) Object.assign(data, raw);
+  else {
+    data.celengan = [{ id: 1, nama: 'Utama', emoji: '💰', target: Number(raw.target) || 0, tanggal: '', tantangan: null, log: Array.isArray(raw.log) ? raw.log : [] }];
+    ['tema', 'nama', 'cur', 'remind'].forEach(k => { if (raw[k] !== undefined) data[k] = raw[k]; });
   }
-} catch (e) {}
-if (!data.celengan.length) data.celengan = [{ id: Date.now(), nama: 'Utama', emoji: '🐷', target: 0, log: [] }];
+} else data.celengan = [baru('Utama', '💰')];
+data.celengan.forEach(c => { if (c.emoji === '🐷') c.emoji = '💰'; if (!Array.isArray(c.log)) c.log = []; c.tanggal = c.tanggal || ''; c.tantangan = c.tantangan || null; });
 if (data.aktif >= data.celengan.length || data.aktif < 0) data.aktif = 0;
 let undoStack = [];
 try { undoStack = (JSON.parse(localStorage.getItem(UKEY)) || []).filter(s => s.indexOf('"celengan"') > -1); } catch (e) {}
@@ -215,7 +257,7 @@ function toast(teks, ms) {
 function urungkan() {
   if (!undoStack.length) return;
   const s = JSON.parse(undoStack.pop());
-  data.celengan = s.celengan; data.aktif = s.aktif;
+  data.celengan = s.celengan; data.aktif = Math.min(s.aktif, Math.max(0, s.celengan.length - 1));
   simpanUndo(); simpan(); render();
   toast('Aksi terakhir dibatalkan', 2500);
 }
@@ -243,10 +285,27 @@ function hujan(emoji, n) {
   }
 }
 
+let ac = null;
+function bunyi(jenis) {
+  if (!data.suara) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const nada = jenis === 'raya' ? [523, 659, 784, 1047] : [988, 1319];
+    nada.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * 0.11;
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.3);
+    });
+  } catch (e) {}
+}
+
 function cekBanner() {
   const b = $('banner');
   b.style.display = 'none';
-  if (!data.remind || bannerTutup) return;
+  if (!data.remind || bannerTutup || !data.celengan.length) return;
   const semua = [].concat(...data.celengan.map(c => c.log)).filter(x => x.nominal > 0);
   const terakhir = semua.reduce((m, x) => x.waktu > m ? x.waktu : m, 0);
   if (!terakhir) { $('bannerTeks').textContent = '⏰ Kamu belum punya tabungan. Yuk mulai nabung!'; b.style.display = 'flex'; return; }
@@ -276,15 +335,63 @@ function gambarChart(log) {
     const bar = document.createElement('div');
     bar.style.height = Math.max(4, b.v / mx * 100) + '%';
     bar.style.opacity = b.v ? 1 : 0.25;
-    bar.title = fmt(b.v);
     bw.appendChild(bar);
     const l = document.createElement('div'); l.className = 'lbl'; l.textContent = b.l;
     col.append(bw, l); ch.appendChild(col);
   });
 }
 
+function gambarLencana() {
+  const semua = [].concat(...data.celengan.map(c => c.log)).filter(x => x.nominal > 0);
+  const hari = new Set(semua.map(x => new Date(x.waktu).toDateString()));
+  let s = 0, d = new Date();
+  if (!hari.has(d.toDateString())) d.setDate(d.getDate() - 1);
+  while (hari.has(d.toDateString())) { s++; d.setDate(d.getDate() - 1); }
+  const tercapai = data.celengan.some(c => c.target > 0 && hitung(c.log) >= c.target);
+  const tantangan = data.celengan.some(c => c.tantangan && c.tantangan.selesai.length >= c.tantangan.n);
+  const daftar = [['🌱', 'Tabungan pertama', semua.length >= 1], ['🔥', 'Beruntun 7 hari', s >= 7], ['💵', 'Nabung 30 kali', semua.length >= 30], ['🎯', 'Target tercapai', tercapai], ['🏆', 'Tantangan selesai', tantangan]];
+  $('bdg').innerHTML = '';
+  daftar.forEach(([e, n, on]) => {
+    const el = document.createElement('div'); el.className = 'bd' + (on ? ' on' : '');
+    el.innerHTML = '<i></i><span></span>';
+    el.children[0].textContent = e; el.children[1].textContent = n;
+    $('bdg').appendChild(el);
+  });
+}
+
 function render() {
   document.documentElement.dataset.tema = data.tema;
+  $('chips').innerHTML = '';
+  data.celengan.forEach((x, i) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (i === data.aktif ? ' on' : '');
+    b.textContent = x.emoji + ' ' + x.nama;
+    b.onclick = () => { data.aktif = i; tampil = 0; simpan(); render(); };
+    $('chips').appendChild(b);
+  });
+  const plus = document.createElement('button');
+  plus.className = 'chip'; plus.textContent = '＋ Baru'; plus.onclick = tambahCelengan;
+  $('chips').appendChild(plus);
+
+  $('nama').value = data.nama; $('cur').value = data.cur; $('remind').value = String(data.remind);
+  $('jam').value = data.jam; $('suara').checked = data.suara;
+  $('btnUndo').style.opacity = undoStack.length ? 1 : 0.4;
+  $('btnPin').textContent = data.pin ? 'Hapus PIN' : 'Pasang PIN';
+  $('dots').innerHTML = '';
+  TEMA.forEach(([k, col]) => {
+    const b = document.createElement('button');
+    b.className = 'dot' + (k === data.tema ? ' on' : '');
+    b.style.background = col;
+    b.onclick = () => { data.tema = k; simpan(); render(); };
+    $('dots').appendChild(b);
+  });
+  gambarLencana(); cekBanner();
+
+  const ada = data.celengan.length > 0;
+  $('utama').style.display = ada ? 'block' : 'none';
+  $('kosong').style.display = ada ? 'none' : 'block';
+  if (!ada) return;
+
   const c = C(), saldo = hitung(c.log);
   animSaldo(saldo);
   $('sapa').textContent = 'Saldo ' + c.emoji + ' ' + c.nama + (data.nama ? ' · ' + data.nama : '');
@@ -295,32 +402,21 @@ function render() {
   $('targetInfo').textContent = c.target > 0
     ? pct + '% dari ' + fmt(c.target) + (saldo >= c.target ? ' 🎉 Tercapai!' : ' (kurang ' + fmt(c.target - saldo) + ')')
     : 'Belum ada target';
-
-  $('chips').innerHTML = '';
-  data.celengan.forEach((x, i) => {
-    const b = document.createElement('button');
-    b.className = 'chip' + (i === data.aktif ? ' on' : '');
-    b.textContent = x.emoji + ' ' + x.nama;
-    b.onclick = () => { data.aktif = i; simpan(); render(); };
-    $('chips').appendChild(b);
-  });
-  const plus = document.createElement('button');
-  plus.className = 'chip'; plus.textContent = '＋ Baru'; plus.onclick = tambahCelengan;
-  $('chips').appendChild(plus);
+  $('kalk').textContent = '';
+  if (c.target > 0 && c.tanggal && saldo < c.target) {
+    const hr = Math.ceil((new Date(c.tanggal + 'T23:59:59') - Date.now()) / 86400000);
+    const sisa = c.target - saldo;
+    $('kalk').textContent = hr > 0
+      ? '🧮 Perlu ' + fmt(sisa / hr) + '/hari · ' + fmt(sisa / Math.max(1, hr / 7)) + '/minggu · ' + fmt(sisa / Math.max(1, hr / 30)) + '/bulan (sampai ' + c.tanggal + ')'
+      : '🧮 Tanggal target sudah lewat.';
+  }
+  $('target').value = ''; $('target').placeholder = c.target ? 'Target saat ini: ' + fmt(c.target) : 'Target tabungan';
+  $('tgl').value = c.tanggal;
 
   const masuk = c.log.filter(x => x.nominal > 0).reduce((s, x) => s + x.nominal, 0);
   const keluar = c.log.filter(x => x.nominal < 0).reduce((s, x) => s - x.nominal, 0);
-  $('stat').innerHTML = '<span class="plus"></span> total masuk<br><span class="minus"></span> total diambil<br><span class="muted"></span>';
-  $('stat').children[0].textContent = fmt(masuk);
-  $('stat').children[1].textContent = fmt(keluar);
-  $('stat').children[2].textContent = c.log.length + ' transaksi';
+  $('stMasuk').textContent = fmt(masuk); $('stKeluar').textContent = fmt(keluar); $('stJumlah').textContent = c.log.length + ' transaksi';
   gambarChart(c.log);
-
-  $('nama').value = data.nama;
-  $('cur').value = data.cur;
-  $('remind').value = String(data.remind);
-  $('btnUndo').style.opacity = undoStack.length ? 1 : 0.4;
-  $('btnPin').textContent = data.pin ? 'Hapus PIN' : 'Pasang PIN';
 
   const Q = data.cur === 'IDR' ? [10000, 50000, 100000] : data.cur === 'JPY' ? [1000, 5000, 10000] : [5, 10, 50];
   $('quick').innerHTML = '';
@@ -331,18 +427,24 @@ function render() {
     $('quick').appendChild(b);
   });
 
-  $('dots').innerHTML = '';
-  TEMA.forEach(([k, col]) => {
-    const b = document.createElement('button');
-    b.className = 'dot' + (k === data.tema ? ' on' : '');
-    b.style.background = col;
-    b.onclick = () => { data.tema = k; simpan(); render(); };
-    $('dots').appendChild(b);
-  });
+  const t = c.tantangan;
+  $('tanGrid').innerHTML = '';
+  if (!t) { $('tanBtn').textContent = 'Mulai'; $('tanInfo').textContent = 'Belum ada tantangan. Pilih 30 hari atau 52 minggu.'; }
+  else {
+    $('tanBtn').textContent = 'Hapus';
+    $('tanInfo').textContent = (t.n === 30 ? 'Tantangan 30 hari' : 'Tantangan 52 minggu') + ' · ' + t.selesai.length + '/' + t.n + ' selesai · tiap ke-N menabung N × ' + fmt(t.dasar);
+    for (let i = 1; i <= t.n; i++) {
+      const b = document.createElement('button');
+      b.className = 'cell' + (t.selesai.includes(i) ? ' ok' : '');
+      b.textContent = i;
+      b.onclick = () => tandaiTantangan(i);
+      $('tanGrid').appendChild(b);
+    }
+  }
 
   const el = $('riwayat'); el.innerHTML = '';
-  if (!c.log.length) { el.innerHTML = '<div class="muted">Belum ada transaksi.</div>'; cekBanner(); return; }
-  c.log.map((x, i) => ({ x, i })).reverse().forEach(({ x, i }) => {
+  if (!c.log.length) el.innerHTML = '<div class="muted">Belum ada transaksi.</div>';
+  else c.log.map((x, i) => ({ x, i })).reverse().forEach(({ x, i }) => {
     const d = document.createElement('div'); d.className = 'item';
     const kiri = document.createElement('div'); kiri.className = 'kiri';
     kiri.innerHTML = '<div></div><div class="muted"></div>';
@@ -356,7 +458,6 @@ function render() {
     h.className = 'small'; h.textContent = '✕'; h.onclick = () => hapus(i);
     kanan.append(nom, h); d.append(kiri, kanan); el.appendChild(d);
   });
-  cekBanner();
 }
 
 function tambah(tanda) {
@@ -369,9 +470,9 @@ function tambah(tanda) {
   $('jumlah').value = ''; $('catatan').value = '';
   simpan(); render();
   toast(tanda > 0 ? 'Tabungan ditambahkan' : 'Uang diambil');
-  if (tanda > 0) hujan(['🪙'], 10);
+  if (tanda > 0) { hujan(['🪙'], 10); bunyi('koin'); }
   const sesudah = sebelum + n * tanda;
-  if (c.target > 0 && sebelum < c.target && sesudah >= c.target) setTimeout(() => hujan(['🎉', '✨', '🎊'], 36), 500);
+  if (c.target > 0 && sebelum < c.target && sesudah >= c.target) setTimeout(() => { hujan(['🎉', '✨', '🎊'], 36); bunyi('raya'); }, 500);
 }
 
 function hapus(i) {
@@ -381,14 +482,24 @@ function hapus(i) {
   snap(); c.log = sisa; simpan(); render(); toast('Transaksi dihapus');
 }
 
-function setTarget() { snap(); C().target = parseFloat($('target').value) || 0; $('target').value = ''; simpan(); render(); }
+function setTarget() {
+  const c = C(), v = $('target').value;
+  snap();
+  if (v !== '') c.target = Math.max(0, parseFloat(v) || 0);
+  c.tanggal = $('tgl').value || '';
+  simpan(); render(); toast('Target disimpan');
+}
+
 function setNama() { data.nama = $('nama').value.trim().slice(0, 20); simpan(); render(); }
 function setCur() { data.cur = $('cur').value; simpan(); tampil = 0; render(); }
-function setRemind() { data.remind = parseInt($('remind').value, 10) || 0; bannerTutup = false; simpan(); render(); }
+function setSuara() { data.suara = $('suara').checked; simpan(); if (data.suara) bunyi('koin'); }
+function setJam() { data.jam = $('jam').value || '19:00'; simpan(); jadwalNotif(false); }
+function setRemind() { data.remind = parseInt($('remind').value, 10) || 0; bannerTutup = false; simpan(); render(); jadwalNotif(false); }
 
 function reset() {
   if (!confirm('Kosongkan celengan ini? (Masih bisa diurungkan)')) return;
-  snap(); C().log = []; C().target = 0; simpan(); render(); toast('Celengan dikosongkan');
+  snap(); const c = C(); c.log = []; c.target = 0; c.tanggal = ''; c.tantangan = null;
+  simpan(); render(); toast('Celengan dikosongkan');
 }
 
 function tambahCelengan() {
@@ -396,7 +507,7 @@ function tambahCelengan() {
   if (!nama || !nama.trim()) return;
   const em = prompt('Emoji (opsional)', '🎯') || '🎯';
   snap();
-  data.celengan.push({ id: Date.now(), nama: nama.trim().slice(0, 16), emoji: Array.from(em.trim()).slice(0, 2).join('') || '🎯', target: 0, log: [] });
+  data.celengan.push(baru(nama.trim().slice(0, 16), Array.from(em.trim()).slice(0, 2).join('') || '🎯'));
   data.aktif = data.celengan.length - 1; tampil = 0;
   simpan(); render(); toast('Celengan baru dibuat');
 }
@@ -413,10 +524,35 @@ function ubahCelengan() {
 }
 
 function hapusCelengan() {
-  if (data.celengan.length <= 1) return alert('Minimal harus ada satu celengan.');
   if (!confirm('Hapus celengan "' + C().nama + '" beserta riwayatnya? (Masih bisa diurungkan)')) return;
   snap(); data.celengan.splice(data.aktif, 1); data.aktif = 0; tampil = 0;
   simpan(); render(); toast('Celengan dihapus');
+}
+
+function aturTantangan() {
+  const c = C();
+  if (c.tantangan) {
+    if (!confirm('Hapus tantangan ini? (Transaksi yang sudah tercatat tetap ada)')) return;
+    snap(); c.tantangan = null; simpan(); render(); return;
+  }
+  const j = prompt('Pilih tantangan:\n1 = 30 hari\n2 = 52 minggu', '1');
+  if (!j) return;
+  const n = j.trim() === '2' ? 52 : 30;
+  const d = parseFloat(prompt('Nominal dasar (ke-N menabung N × nominal ini)', data.cur === 'IDR' ? '1000' : '1'));
+  if (!d || d <= 0) return alert('Nominal tidak valid.');
+  snap(); c.tantangan = { n: n, dasar: d, selesai: [] };
+  simpan(); render(); toast('Tantangan dimulai!');
+}
+
+function tandaiTantangan(i) {
+  const c = C(), t = c.tantangan;
+  if (t.selesai.includes(i)) return alert('Sudah selesai. Kalau salah tekan, pakai tombol Urungkan.');
+  snap();
+  t.selesai.push(i);
+  c.log.push({ nominal: bulat(i * t.dasar), catatan: 'Tantangan ' + (t.n === 30 ? 'hari' : 'minggu') + ' ke-' + i, waktu: Date.now() });
+  simpan(); render(); hujan(['🪙'], 8); bunyi('koin');
+  toast('Selesai ke-' + i + ': +' + fmt(i * t.dasar));
+  if (t.selesai.length >= t.n) setTimeout(() => { hujan(['🏆', '🎉', '✨'], 36); bunyi('raya'); }, 500);
 }
 
 async function hash(p) {
@@ -448,6 +584,28 @@ async function bukaKunci() {
   else { $('pinIn').value = ''; $('pinErr').textContent = 'PIN salah'; }
 }
 
+function jadwalNotif(diam) {
+  try {
+    const L = window.cordova && cordova.plugins && cordova.plugins.notification && cordova.plugins.notification.local;
+    if (!L) return;
+    try { L.cancel(1001); } catch (e) {}
+    if (!data.remind) return;
+    const hm = (data.jam || '19:00').split(':').map(Number);
+    const every = { hour: hm[0], minute: hm[1] };
+    if (data.remind === 7) every.weekday = new Date().getDay() + 1;
+    if (data.remind === 30) every.day = Math.min(28, new Date().getDate());
+    const pasang = () => {
+      L.schedule({ id: 1001, title: 'NabungYuk 💰', text: 'Sudah nabung hari ini? Yuk nabung sedikit!', trigger: { every: every } });
+      if (!diam) toast('Pengingat dijadwalkan');
+    };
+    L.hasPermission(ada => {
+      if (ada) pasang();
+      else if (!diam) L.requestPermission(ok => { if (ok) pasang(); else toast('Izin notifikasi ditolak'); });
+    });
+  } catch (e) {}
+}
+document.addEventListener('deviceready', () => jadwalNotif(true));
+
 function ekspor() {
   const rest = Object.assign({}, data); delete rest.pin;
   const el = $('backup');
@@ -460,24 +618,30 @@ function ekspor() {
 function impor() {
   try {
     const p = JSON.parse($('backup').value);
+    const rapi = (c, i) => {
+      const t = c.tantangan;
+      return {
+        id: c.id || Date.now() + i,
+        nama: String(c.nama || 'Utama').slice(0, 16),
+        emoji: String(c.emoji || '🎯').slice(0, 4),
+        target: Number(c.target) || 0,
+        tanggal: /^\d{4}-\d{2}-\d{2}$/.test(c.tanggal || '') ? c.tanggal : '',
+        tantangan: t && (t.n === 30 || t.n === 52) && Number(t.dasar) > 0 && Array.isArray(t.selesai) ? { n: t.n, dasar: Number(t.dasar), selesai: t.selesai.filter(Number.isInteger) } : null,
+        log: (Array.isArray(c.log) ? c.log : []).filter(valid)
+      };
+    };
     let cel;
-    const rapi = (c, i) => ({
-      id: c.id || Date.now() + i,
-      nama: String(c.nama || 'Utama').slice(0, 16),
-      emoji: String(c.emoji || '🎯').slice(0, 4),
-      target: Number(c.target) || 0,
-      log: (Array.isArray(c.log) ? c.log : []).filter(valid)
-    });
     if (p && Array.isArray(p.celengan)) cel = p.celengan.map(rapi);
-    else if (p && Array.isArray(p.log)) cel = [rapi({ nama: 'Utama', emoji: '🐷', target: p.target, log: p.log }, 0)];
+    else if (p && Array.isArray(p.log)) cel = [rapi({ nama: 'Utama', emoji: '💰', target: p.target, log: p.log }, 0)];
     else throw new Error('format');
-    if (!cel.length) throw new Error('kosong');
     if (!confirm('Timpa data sekarang dengan data backup?')) return;
     snap();
     data.celengan = cel; data.aktif = 0; tampil = 0;
     if (TEMA.some(t => t[0] === p.tema)) data.tema = p.tema;
     if (CURS.includes(p.cur)) data.cur = p.cur;
     if ([0, 1, 7, 30].includes(p.remind)) data.remind = p.remind;
+    if (/^\d{2}:\d{2}$/.test(p.jam || '')) data.jam = p.jam;
+    if (typeof p.suara === 'boolean') data.suara = p.suara;
     data.nama = String(p.nama || '').slice(0, 20);
     simpan(); render(); $('backup').value = '';
     alert('Impor berhasil.');
