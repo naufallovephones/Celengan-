@@ -19,7 +19,6 @@ jobs:
           java-version: 17
       - run: npm install -g cordova
       - run: cordova platform add android
-      - run: cordova plugin add @moodlehq/cordova-plugin-local-notification
       - run: cordova build android
       - uses: actions/upload-artifact@v4
         with:
