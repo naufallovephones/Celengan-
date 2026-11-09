@@ -22,7 +22,46 @@ jobs:
           gradle-version: 8.14.2
       - run: npm install -g cordova
       - run: cordova platform add android
-      - run: cordova build android
+      - name: Buat ikon
+        continue-on-error: true
+        run: |
+          python3 -m pip install pillow || python3 -m pip install --break-system-packages pillow
+          mkdir -p res
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          S = 512
+          img = Image.new("RGB", (S, S))
+          px = img.load()
+          for y in range(S):
+              for x in range(S):
+                  t = (x + y) / (2 * S)
+                  px[x, y] = (int(22 + 52 * t), int(163 + 59 * t), int(74 + 54 * t))
+          d = ImageDraw.Draw(img)
+          c = S // 2
+          R = 165
+          d.ellipse([c-R-13, c-R-13, c+R+13, c+R+13], fill=(180, 120, 10))
+          d.ellipse([c-R, c-R, c+R, c+R], fill=(251, 191, 36))
+          d.ellipse([c-R+32, c-R+32, c+R-32, c+R-32], outline=(217, 150, 10), width=11)
+          w = 18
+          x0, x1, y0, y1 = c-48, c+48, c-70, c+70
+          col = (146, 94, 6)
+          d.line([x0, y1, x0, y0], fill=col, width=w)
+          d.line([x1, y1, x1, y0], fill=col, width=w)
+          d.line([x0, y0, x1, y1], fill=col, width=w)
+          img.save("res/icon.png")
+          PY
+          test -f res/icon.png
+          sed -i 's|<platform name="android">|<platform name="android">\n        <icon src="res/icon.png" />|' config.xml
+      - name: Build
+        run: |
+          if cordova plugin add @moodlehq/cordova-plugin-local-notification cordova-plugin-fingerprint-aio --nosave && cordova build android; then
+            echo "Build dengan plugin berhasil"
+          else
+            echo "Plugin bermasalah, build ulang tanpa plugin"
+            rm -rf platforms plugins
+            cordova platform add android
+            cordova build android
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: nabungyuk-apk
