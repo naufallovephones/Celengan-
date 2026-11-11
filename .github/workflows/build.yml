@@ -54,13 +54,21 @@ jobs:
           sed -i 's|<platform name="android">|<platform name="android">\n        <icon src="res/icon.png" />|' config.xml
       - name: Build
         run: |
-          if cordova plugin add @moodlehq/cordova-plugin-local-notification cordova-plugin-fingerprint-aio --nosave && cordova build android; then
-            echo "Build dengan plugin berhasil"
+          P1="@moodlehq/cordova-plugin-local-notification cordova-plugin-fingerprint-aio"
+          P2="cordova-plugin-x-socialsharing"
+          bersih() { rm -rf platforms plugins; cordova platform add android; }
+          if cordova plugin add $P1 $P2 --nosave && cordova build android; then
+            echo "Build dengan 3 plugin berhasil"
           else
-            echo "Plugin bermasalah, build ulang tanpa plugin"
-            rm -rf platforms plugins
-            cordova platform add android
-            cordova build android
+            echo "Coba tanpa plugin berbagi"
+            bersih
+            if cordova plugin add $P1 --nosave && cordova build android; then
+              echo "Build dengan 2 plugin berhasil"
+            else
+              echo "Build tanpa plugin"
+              bersih
+              cordova build android
+            fi
           fi
       - uses: actions/upload-artifact@v4
         with:
