@@ -1,0 +1,35 @@
+name: Build Catur APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'catur/**'
+      - '.github/workflows/catur.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: catur
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.14.2
+      - run: npm install -g cordova
+      - run: cordova platform add android
+      - run: cordova build android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catur-apk
+          path: catur/platforms/android/app/build/outputs/apk/**/*.apk
